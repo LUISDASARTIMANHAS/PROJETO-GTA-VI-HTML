@@ -54,12 +54,19 @@ body {
 }
 
 .capa {
-    min-height: 100vh;
+    height: 300vh;
+    position: relative;
+}
+
+.capa-sticky {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: relative;
     overflow: hidden;
     padding-top: 40px;
 }

@@ -37,36 +37,33 @@ blocos.forEach((bloco) => {
 });
 
 
-// 3. VÍDEO QUE ANDA COM O SCROLL
-//    - achar o vídeo da capa
-//    - prender a capa na tela enquanto a pessoa rola
-//    - sumir com o conteúdo da capa e revelar o vídeo
-//    - avançar o tempo do vídeo conforme o scroll
+// Registrar o plugin ScrollTrigger do GSAP
+gsap.registerPlugin(ScrollTrigger);
+
+// 3. VÍDEO QUE ANDA COM O SCROLL COM GSAP
 const capa = document.querySelector(".capa");
 const capaConteudo = document.querySelector(".capa-conteudo");
 const capaBarra = document.querySelector(".capa-barra");
 
-window.addEventListener("scroll", () => {
-  const scrollTop = window.scrollY;
-  const capaHeight = capa.offsetHeight - window.innerHeight;
-
-  if (capaHeight > 0) {
-    let progresso = scrollTop / capaHeight;
-    if (progresso < 0) progresso = 0;
-    if (progresso > 1) progresso = 1;
-
-    // Se o vídeo já tiver a duração carregada, atualiza o tempo proporcionalmente ao scroll
-    if (video.duration) {
-      video.currentTime = progresso * video.duration;
+if (video) {
+  // Criamos uma timeline controlada pelo scroll utilizando ScrollTrigger
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: capa,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: true, // Sincroniza a animação com a rolagem do scroll
     }
+  });
 
-    // Faz o conteúdo da capa sumir conforme rola (fade out)
-    const opacidade = 1 - progresso * 1.5;
-    capaConteudo.style.opacity = opacidade >= 0 ? opacidade : 0;
-    capaBarra.style.opacity = opacidade >= 0 ? opacidade : 0;
-
-    // Revela o vídeo conforme o scroll
-    const opacidadeVideo = progresso * 1.5;
-    video.style.opacity = opacidadeVideo <= 1 ? opacidadeVideo : 1;
-  }
-});
+  // Sumir com o conteúdo da capa bem rápido logo no início do scroll
+  tl.to(capaConteudo, { opacity: 0, duration: 0.3 }, 0)
+    .to(capaBarra, { opacity: 0, duration: 0.3 }, 0)
+    // Revelar o vídeo de forma gradual
+    .to(video, { opacity: 1, duration: 0.4 }, 0)
+    // Avançar o tempo de reprodução do vídeo proporcionalmente ao scroll
+    .to(video, {
+      currentTime: () => video.duration || 0,
+      ease: "none"
+    }, 0);
+}
